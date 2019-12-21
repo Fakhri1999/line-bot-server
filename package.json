@@ -1,0 +1,23 @@
+{
+  "name": "simple-line-bot-server-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "@line/bot-sdk": "^6.8.4",
+    "axios": "^0.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "moment": "^2.24.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "start": "node app",
+    "dev": "nodemon app"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

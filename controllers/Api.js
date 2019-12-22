@@ -28,7 +28,11 @@ const apiController = {
 
 async function eventHandler(event) {
   if (event.type !== "message") {
-    return Promise.resolve(null);
+    // if someone invite this bot to a group / room
+    if(event.type == "join"){
+      let replyMessage = 'Terimakasih telah mengundang aku ke grup ini. Ketik ",help" untuk melihat daftar perintah yang tersedia'
+      return client.replyMessage(event.replyToken, textBuilder(replyMessage))
+    }
   }
 
   let userMessage = event.message.text || '';
@@ -87,7 +91,6 @@ async function eventHandler(event) {
           replyMessage = `Nama : ${chatFile[i].displayName}\nWaktu : ${chatFile[i].time}\nPesan : ${chatFile[i].userMessage}`
           break;
         }
-
       }
 
       // if there is no chat that has the same groupID, it will return this message

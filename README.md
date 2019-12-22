@@ -25,4 +25,5 @@ npm run dev
 |,ig **_instagram_username_**|Search a photo profile of an instagram account|,ig instagram|
 |,re-unsend|Send the latest message from the group (This feature only works in group)|,re-unsend|
 |,tambah-fitur **_text_**|Give a feature suggestion to the bot creator|,tambah-fitur tambah fitur cari jodoh dong|
-|,pilih **_choice_** atau **_choice_**?|Give a bot some choices and the bot will choose 1 from the choice (Choice are separated with "atau", Min 2 choice, max unlimited choice)|,pilih aku atau dia?|
+|,pilih **_choice1_** atau **_choice2_**?|Give a bot some choices and the bot will choose 1 from the choice (Choice are separated with "atau", Min 2 choice, max unlimited choice)|,pilih aku atau dia?|
+|,help|Show list of available commands|,help|

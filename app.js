@@ -4,7 +4,6 @@ const { PORT, CHANNEL } = require("./config");
 const apiController = require("./controllers/Api");
 const line = require("@line/bot-sdk");
 
-
 // create config for LINE SDK
 const config = {
   channelAccessToken: CHANNEL.CHANNEL_ACCESS_TOKEN,

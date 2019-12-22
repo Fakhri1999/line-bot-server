@@ -22,7 +22,7 @@ npm run dev
 |-------|-----------|-------|
 |,halo|Make a simple greetings to the bot|,halo|
 |,apakah **_text_**?|Give a bot question and the bot will answer with 1 of this 3 option ("Ya", "Bisa jadi", "Tidak")|,apakah hari ini akan hujan?|
-|,ig **_instagram username_**|Search a photo profile of an instagram account|,ig instagram|
+|,ig **_instagram_username_**|Search a photo profile of an instagram account|,ig instagram|
 |,re-unsend|Send the latest message from the group (This feature only works in group)|,re-unsend|
 |,tambah-fitur **_text_**|Give a feature suggestion to the bot creator|,tambah-fitur tambah fitur cari jodoh dong|
 |,pilih **_choice_** atau **_choice_**?|Give a bot some choices and the bot will choose 1 from the choice (Choice are separated with "atau", Min 2 choice, max unlimited choice)|,pilih aku atau dia?|

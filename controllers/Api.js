@@ -31,7 +31,7 @@ async function eventHandler(event) {
     return Promise.resolve(null);
   }
 
-  let userMessage = event.message.text;
+  let userMessage = event.message.text || '';
   // if the message contain the "," in the beginning
   if (userMessage.startsWith(",")) {
     userMessage = userMessage.substring(1).toLowerCase();

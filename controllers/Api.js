@@ -159,10 +159,10 @@ async function eventHandler(event) {
       }
     } else if (keyword == 'help') {
       replyMessage = `1. Untuk mendapatkan jawaban dari kerang ajaib :\n,apakah <text> ?
-      \n2. Untuk menampilkan foto profil IG seseorang :\n,ig <username IG>
+      \n2. Untuk menampilkan foto profil IG seseorang :\n,ig <username_ig>
       \n3. Untuk menampilkan 1 pesan terakhir yang diunsent (Sementara, hanya bisa untuk teks) :\n,re-unsend
       \n4. Untuk memberi saran tambahan fitur untuk bot ini :\n,tambah-fitur <text>
-      \n5. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih <text> atau <text>
+      \n5. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih <pilihan_1> atau <pilihan_2>?
       \nBACA DOKUMENTASI LENGKAP : https://github.com/Fakhri1999/line-bot-server`
     } else {
       replyMessage = 'Hayo lho ngetik apaan tuh. Ketik ,help untuk menampilkan list perintah'

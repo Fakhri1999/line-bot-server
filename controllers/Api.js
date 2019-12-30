@@ -93,6 +93,7 @@ async function eventHandler(event) {
         // if found the chat with the same groupID, take the message and stop the looping
         if (chatFile[i].groupId == groupId) {
           chatAda = true;
+          chatFile[i].displayName = chatFile[i].displayName == null ? '' : chatFile[i].displayName
           replyMessage = `Nama : ${chatFile[i].displayName}\nWaktu : ${chatFile[i].time}\nPesan : ${chatFile[i].userMessage}`;
           break;
         }
@@ -126,7 +127,13 @@ async function eventHandler(event) {
         replyMessage = "Pesanmu kosong";
       } else {
         // get the display name of the user
-        let displayName = (await client.getProfile(event.source.userId)).displayName;
+        userId = event.source.userId
+        try {
+          profile = userId == null ? null : (await client.getProfile(userId))
+        } catch (err){
+          profile = null
+        }
+        displayName = profile == null ? null : profile.displayName;
 
         // import models and make the insert config
         const apiModel = require("../models/Api");
@@ -171,7 +178,13 @@ async function eventHandler(event) {
         replyMessage = "Pesanmu kosong";
       } else {
         // get the display name of the user
-        let displayName = (await client.getProfile(event.source.userId)).displayName;
+        userId = event.source.userId
+        try {
+          profile = userId == null ? null : (await client.getProfile(userId))
+        } catch (err){
+          profile = null
+        }
+        displayName = profile == null ? null : profile.displayName;
 
         // import models and make the insert config
         const apiModel = require("../models/Api");
@@ -215,6 +228,9 @@ async function eventHandler(event) {
   } else {
     // take the groupID from the message
     groupId = event.source.groupId;
+    userId = event.source.userId
+    console.log(event.source)
+    // return
 
     // if the message is from a group
     if (groupId != null) {
@@ -222,7 +238,14 @@ async function eventHandler(event) {
       chatFile = fs.readFileSync("chat.json", "utf8");
 
       // get the displayName from the message
-      displayName = (await client.getProfile(event.source.userId)).displayName;
+      try {
+        profile = userId == null ? null : (await client.getProfile(userId))
+      } catch (err){
+        profile = null
+        console.log(err.message)
+      }
+      console.log(profile)
+      displayName = profile == null ? null : profile.displayName;
 
       // if the chats is empty
       if (chatFile.length == 0) {

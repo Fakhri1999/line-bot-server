@@ -6,6 +6,7 @@ const utils = require("../utils/utils");
 const { CHANNEL, SECRET_KEY } = require("../config");
 const { textBuilder, imageBuilder } = require("../helper/Builder");
 const fs = require("fs");
+const FileType = require("file-type");
 
 // create config for LINE SDK
 const config = {
@@ -88,20 +89,25 @@ async function eventHandler(event) {
     groupId = event.source.groupId;
     userId = event.source.userId;
     messageId = event.message.id;
+    messageType = event.message.type;
+    console.log(messageType)
     if (groupId != null) {
       try {
         profile =
           userId == null
             ? null
             : await client.getGroupMemberProfile(groupId, userId);
-        // content = await client.getMessageContent(messageId).then(stream => {
-        //   stream.on("data", chunk => {
-        //     let imageBuffer = chunk;
-        //     let imageName = "public/img/gambar.jpg";
-        //     fs.createWriteStream(imageName).write(imageBuffer);
-        //   });
-        //   stream.on("error", err => {});
-        // });
+        if (messageType == "image") {
+          content = await client.getMessageContent(messageId).then(stream => {
+            stream.on("data", async chunk => {
+              let imageBuffer = chunk;
+              let type = await FileType.fromBuffer(imageBuffer);
+              let imageName = `public/img/gambar.${type.ext}`;
+              fs.createWriteStream(imageName).write(imageBuffer);
+            });
+            stream.on("error", err => {});
+          });
+        }
       } catch (err) {
         profile = "";
       }

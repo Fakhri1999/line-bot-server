@@ -7,7 +7,7 @@ const { CHANNEL, SECRET_KEY } = require("../config");
 const { textBuilder, imageBuilder } = require("../helper/Builder");
 const fs = require("fs");
 const FileType = require("file-type");
-
+let baseUrl = "";
 // create config for LINE SDK
 const config = {
   channelAccessToken: CHANNEL.CHANNEL_ACCESS_TOKEN,
@@ -19,6 +19,7 @@ const client = new line.Client(config);
 
 const apiController = {
   lineApi: (req, res) => {
+    baseUrl = `${req.protocol}://${req.headers.host}`
     Promise.all(req.body.events.map(eventHandler))
       .then(result => res.json(result))
       .catch(err => {
@@ -28,7 +29,7 @@ const apiController = {
   }
 };
 
-async function eventHandler(event) {
+async function eventHandler(event, baseUrl) {
   if (event.type !== "message") {
     if (event.type == "join") {
       let replyMessage =
@@ -60,7 +61,8 @@ async function eventHandler(event) {
       replyMessage = botCommand.reUnsend(
         event.source.groupId,
         chatFile,
-        userMessage
+        userMessage,
+        baseUrl
       );
     } else if (keyword == "pilih" && userMessage.endsWith("?")) {
       replyMessage = botCommand.pilih(userMessage);
@@ -84,38 +86,51 @@ async function eventHandler(event) {
       replyMessage =
         "Hayo lho ngetik apaan tuh. Ketik ,help untuk menampilkan list perintah";
     }
-    return client.replyMessage(event.replyToken, textBuilder(replyMessage));
+    if (Array.isArray(replyMessage)) {
+      // let kotak = []
+      // replyMessage.forEach(e => {
+      // });
+    } else {
+      return client.replyMessage(event.replyToken, textBuilder(replyMessage));
+    }
   } else {
     groupId = event.source.groupId;
     userId = event.source.userId;
     messageId = event.message.id;
     messageType = event.message.type;
-    console.log(messageType)
     if (groupId != null) {
       try {
         profile =
           userId == null
             ? null
             : await client.getGroupMemberProfile(groupId, userId);
+        displayName = profile == null ? null : profile.displayName;
+        tempImageName = [];
         if (messageType == "image") {
-          content = await client.getMessageContent(messageId).then(stream => {
+          content = await client.getMessageContent(messageId).then(async stream => {
             stream.on("data", async chunk => {
-              let imageBuffer = chunk;
-              let type = await FileType.fromBuffer(imageBuffer);
-              let imageName = `public/img/gambar.${type.ext}`;
-              fs.createWriteStream(imageName).write(imageBuffer);
+              try {
+                let imageBuffer = chunk;
+                let type = await FileType.fromBuffer(imageBuffer);
+                // chatFile.forEach(e => {
+                //   if ()
+                // });
+                let imageName = `public/img/${displayName}.${type.ext}`;
+                tempImageName.push(imageName);
+                fs.createWriteStream(imageName).write(imageBuffer);
+              } catch (error) { }
             });
-            stream.on("error", err => {});
           });
         }
       } catch (err) {
         profile = "";
       }
-      displayName = profile == null ? null : profile.displayName;
+      // userMessage = tempImageName[0];
       let chatNew = {
         groupId,
         chats: [
           {
+            messageType,
             displayName,
             userMessage,
             time: moment().format("HH:mm:ss")
@@ -132,6 +147,7 @@ async function eventHandler(event) {
               await chatFile[i].chats.shift();
             }
             await chatFile[i].chats.push({
+              messageType,
               displayName,
               userMessage,
               time: moment().format("HH:mm:ss")

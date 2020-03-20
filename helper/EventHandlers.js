@@ -13,7 +13,7 @@ const botCommand = {
   help: () => {
     return `1. Untuk mendapatkan jawaban dari kerang ajaib :\n,apakah {text} ?
     \n2. Untuk menampilkan foto profil IG seseorang :\n,ig {username_ig}
-    \n3. Untuk menampilkan pesan terakhir yang diunsent (Sementara, hanya bisa untuk teks) :\n,re-unsend {jumlah}
+    \n3. Untuk menampilkan pesan terakhir yang diunsent (Sementara, hanya bisa untuk teks) :\n,re-unsend
     \n4. Untuk memberi saran tambahan fitur untuk bot ini :\n,tambah-fitur {text}
     \n5. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih {pilihan_1} atau {pilihan_2}?
     \n6. Untuk mengirimkan pesan rahasia : \n,tambah-pesan {text}
@@ -60,25 +60,31 @@ const botCommand = {
       };
     }
   },
-  reUnsend: (groupId, chatFile, userMessage) => {
+  reUnsend: (groupId, chatFile, userMessage, baseUrl) => {
     let jumlah = userMessage.split(" ")[1] || undefined;
     if (jumlah > 5) {
       return "Oopss... cuma bisa nampilin max 5 pesan terakhir cuy";
     }
     let chatAda = false;
-
     for (let i = 0; i < chatFile.length; i++) {
       if (chatFile[i].groupId == groupId) {
         chatAda = true;
-        let chats = chatFile[i].chats;
+        let chats = chatFile[i].chats;        
+        let tempText = [];
         let temp = [];
         let batas = jumlah || chats.length;
         for (let j = 0; j < batas; j++) {
-          temp.push(
+          if(chats[j].messageType == 'image'){
+            temp.push({
+              url: `${baseUrl}/${chats[j].userMessage}`
+            })
+          }
+          tempText.push(
             `Nama : ${chats[j].displayName}\nWaktu : ${chats[j].time}\nPesan : ${chats[j].userMessage}\n\n`
           );
         }
-        return temp.join("");
+        tempText = tempText.join("");
+        return tempText;
       }
     }
     if (!chatAda) {

@@ -5,6 +5,7 @@ const chatFile = require("../data/chat");
 const utils = require("../utils/utils");
 const { CHANNEL, SECRET_KEY } = require("../config");
 const { textBuilder, imageBuilder } = require("../helper/Builder");
+const fs = require("fs");
 
 // create config for LINE SDK
 const config = {
@@ -44,7 +45,7 @@ async function eventHandler(event) {
     } else if (keyword == "apakah" && userMessage.endsWith("?")) {
       replyMessage = botCommand.apakah();
     } else if (keyword == "ig") {
-      let result = await botCommand.instagram();
+      let result = await botCommand.instagram(userMessage);
       if (!result.error) {
         let data = result.data;
         return client.replyMessage(
@@ -86,9 +87,21 @@ async function eventHandler(event) {
   } else {
     groupId = event.source.groupId;
     userId = event.source.userId;
+    messageId = event.message.id;
     if (groupId != null) {
       try {
-        profile = userId == null ? null : await client.getProfile(userId);
+        profile =
+          userId == null
+            ? null
+            : await client.getGroupMemberProfile(groupId, userId);
+        // content = await client.getMessageContent(messageId).then(stream => {
+        //   stream.on("data", chunk => {
+        //     let imageBuffer = chunk;
+        //     let imageName = "public/img/gambar.jpg";
+        //     fs.createWriteStream(imageName).write(imageBuffer);
+        //   });
+        //   stream.on("error", err => {});
+        // });
       } catch (err) {
         profile = "";
       }

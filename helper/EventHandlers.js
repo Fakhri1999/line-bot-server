@@ -36,11 +36,12 @@ const botCommand = {
     }
     return result;
   },
-  instagram: async () => {
+  instagram: async userMessage => {
     try {
       let { data, status } = await axios.get(
-        `https://www.instagram.com/${userMessageArray[1]}/?__a=1`
+        `https://www.instagram.com/${userMessage.split(" ")[1]}/?__a=1`
       );
+      console.log(status);
       if (status == 200) {
         let user = data.graphql.user;
         return {

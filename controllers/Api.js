@@ -1,5 +1,5 @@
 const line = require("@line/bot-sdk");
-const moment = require("moment");
+const moment = require("moment-timezone");
 const botCommand = require("../helper/EventHandlers");
 const chatFile = require("../data/chat");
 const utils = require("../utils/utils");
@@ -16,7 +16,7 @@ const config = {
 
 // create LINE SDK
 const client = new line.Client(config);
-
+baseUrl = ''
 const apiController = {
   lineApi: (req, res) => {
     baseUrl = `${req.protocol}://${req.headers.host}`
@@ -29,7 +29,7 @@ const apiController = {
   }
 };
 
-async function eventHandler(event, baseUrl) {
+async function eventHandler(event) {
   if (event.type !== "message") {
     if (event.type == "join") {
       let replyMessage =
@@ -105,27 +105,29 @@ async function eventHandler(event, baseUrl) {
             ? null
             : await client.getGroupMemberProfile(groupId, userId);
         displayName = profile == null ? null : profile.displayName;
-        tempImageName = [];
-        if (messageType == "image") {
-          content = await client.getMessageContent(messageId).then(async stream => {
-            stream.on("data", async chunk => {
-              try {
-                let imageBuffer = chunk;
-                let type = await FileType.fromBuffer(imageBuffer);
-                // chatFile.forEach(e => {
-                //   if ()
-                // });
-                let imageName = `public/img/${displayName}.${type.ext}`;
-                tempImageName.push(imageName);
-                fs.createWriteStream(imageName).write(imageBuffer);
-              } catch (error) { }
-            });
-          });
-        }
       } catch (err) {
         profile = "";
       }
-      // userMessage = tempImageName[0];
+      if (messageType == "image") {
+        content = await client.getMessageContent(messageId).then(async stream => {
+          let arr = []
+          stream.on("data", async chunk => {
+            try {
+              arr.push(chunk)
+            } catch (error) { }
+          });
+          setTimeout(async () => {
+            let imageBuffer = Buffer.concat(arr)
+            let type = await FileType.fromBuffer(imageBuffer);
+            // chatFile.forEach(e => {
+            //   if (){
+            //   }
+            // });
+            let imageName = `public/img/${displayName}.${type.ext}`;
+            fs.createWriteStream(imageName).write(imageBuffer);
+          }, 1000);
+        });
+      }
       let chatNew = {
         groupId,
         chats: [
@@ -133,7 +135,7 @@ async function eventHandler(event, baseUrl) {
             messageType,
             displayName,
             userMessage,
-            time: moment().format("HH:mm:ss")
+            time: moment().tz("Asia/Jakarta").format("HH:mm:ss")
           }
         ]
       };
@@ -150,7 +152,7 @@ async function eventHandler(event, baseUrl) {
               messageType,
               displayName,
               userMessage,
-              time: moment().format("HH:mm:ss")
+              time: moment().tz("Asia/Jakarta").format("HH:mm:ss")
             });
             grupSama = true;
           }

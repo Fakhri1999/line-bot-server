@@ -13,7 +13,7 @@ const botCommand = {
   help: () => {
     return `1. Untuk mendapatkan jawaban dari kerang ajaib :\n,apakah {text} ?
     \n2. Untuk menampilkan foto profil IG seseorang :\n,ig {username_ig}
-    \n3. Untuk menampilkan pesan terakhir yang diunsent (Sementara, hanya bisa untuk teks) :\n,re-unsend
+    \n3. Untuk menampilkan pesan terakhir yang diunsent (Hanya bisa digunakan dalam grup chat) :\n,re-unsend
     \n4. Untuk memberi saran tambahan fitur untuk bot ini :\n,tambah-fitur {text}
     \n5. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih {pilihan_1} atau {pilihan_2}?
     \n6. Untuk mengirimkan pesan rahasia : \n,tambah-pesan {text}
@@ -61,6 +61,9 @@ const botCommand = {
     }
   },
   reUnsend: (groupId, chatFile, userMessage, baseUrl) => {
+    if(groupId == undefined){
+      return "Fitur ini hanya bisa digunakan didalam grup chat";
+    }
     let jumlah = userMessage.split(" ")[1] || undefined;
     if (jumlah > 5) {
       return "Oopss... cuma bisa nampilin max 5 pesan terakhir cuy";
@@ -84,7 +87,9 @@ const botCommand = {
           );
         }
         tempText = tempText.join("");
-        return tempText;
+        tempText.push(temp)
+        console.log(tempText)
+        // return tempText;
       }
     }
     if (!chatAda) {

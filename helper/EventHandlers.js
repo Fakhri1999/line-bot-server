@@ -61,7 +61,7 @@ const botCommand = {
     }
   },
   reUnsend: (groupId, chatFile, userMessage, baseUrl) => {
-    if(groupId == undefined){
+    if (groupId == undefined) {
       return "Fitur ini hanya bisa digunakan didalam grup chat";
     }
     let jumlah = userMessage.split(" ")[1] || undefined;
@@ -72,24 +72,33 @@ const botCommand = {
     for (let i = 0; i < chatFile.length; i++) {
       if (chatFile[i].groupId == groupId) {
         chatAda = true;
-        let chats = chatFile[i].chats;        
+        let chats = chatFile[i].chats;
         let tempText = [];
         let temp = [];
         let batas = jumlah || chats.length;
         for (let j = 0; j < batas; j++) {
-          if(chats[j].messageType == 'image'){
+          if (chats[j].messageType == "image") {
             temp.push({
               url: `${baseUrl}/${chats[j].userMessage}`
-            })
+            });
+            tempText.push(
+              `Nama : ${chats[j].displayName}\nWaktu : ${chats[j].time}\nPesan : image\n\n`
+            );
+          } else {
+            tempText.push(
+              `Nama : ${chats[j].displayName}\nWaktu : ${chats[j].time}\nPesan : ${chats[j].userMessage}\n\n`
+            );
           }
-          tempText.push(
-            `Nama : ${chats[j].displayName}\nWaktu : ${chats[j].time}\nPesan : ${chats[j].userMessage}\n\n`
-          );
         }
         tempText = tempText.join("");
-        tempText.push(temp)
-        console.log(tempText)
-        // return tempText;
+        let arrResult = [];
+        if (temp.length == 0) {
+          return tempText;
+        } else {
+          arrResult.push(tempText);
+          arrResult.push(temp);
+          return arrResult;
+        }
       }
     }
     if (!chatAda) {

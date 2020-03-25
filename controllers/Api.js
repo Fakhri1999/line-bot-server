@@ -2,6 +2,7 @@ const line = require("@line/bot-sdk");
 const moment = require("moment-timezone");
 const botCommand = require("../helper/EventHandlers");
 const chatFile = require("../data/chat");
+const chatImage = require("../data/chatImage");
 const utils = require("../utils/utils");
 const { CHANNEL, SECRET_KEY } = require("../config");
 const { textBuilder, imageBuilder } = require("../helper/Builder");
@@ -16,14 +17,14 @@ const config = {
 
 // create LINE SDK
 const client = new line.Client(config);
-baseUrl = ''
+baseUrl = "";
 const apiController = {
   lineApi: (req, res) => {
-    baseUrl = `${req.protocol}://${req.headers.host}`
+    baseUrl = `${req.protocol}://${req.headers.host}`;
     Promise.all(req.body.events.map(eventHandler))
       .then(result => res.json(result))
       .catch(err => {
-        console.error(err);
+        // console.error(err);
         res.status(500).end();
       });
   }
@@ -87,9 +88,20 @@ async function eventHandler(event) {
         "Hayo lho ngetik apaan tuh. Ketik ,help untuk menampilkan list perintah";
     }
     if (Array.isArray(replyMessage)) {
-      // let kotak = []
-      // replyMessage.forEach(e => {
-      // });
+      let arrReply = [];
+      for (let i = 0; i < replyMessage.length; i++) {
+        if (i == 0) {
+          arrReply.push(textBuilder(replyMessage[i]));
+        } else {
+          arrReply.push(
+            imageBuilder(replyMessage[i][0].url, replyMessage[i][0].url)
+          );
+        }
+      }
+      console.log(arrReply);
+      return client.replyMessage(event.replyToken, arrReply).catch(err => {
+        console.error(err.message);
+      });      
     } else {
       return client.replyMessage(event.replyToken, textBuilder(replyMessage));
     }
@@ -109,56 +121,97 @@ async function eventHandler(event) {
         profile = "";
       }
       if (messageType == "image") {
-        content = await client.getMessageContent(messageId).then(async stream => {
-          let arr = []
-          stream.on("data", async chunk => {
-            try {
-              arr.push(chunk)
-            } catch (error) { }
+        content = await client
+          .getMessageContent(messageId)
+          .then(async stream => {
+            let arr = [];
+            stream.on("data", async chunk => {
+              try {
+                arr.push(chunk);
+              } catch (error) {}
+            });
+            setTimeout(async () => {
+              let imageBuffer = Buffer.concat(arr);
+              let type = await FileType.fromBuffer(imageBuffer);
+              let imageName = `img/${displayName}.${type.ext}`;
+              fs.createWriteStream(`public/${imageName}`).write(imageBuffer);
+              userMessage = imageName;
+              let chatNew = {
+                groupId,
+                chats: [
+                  {
+                    messageType,
+                    displayName,
+                    userMessage,
+                    time: moment()
+                      .tz("Asia/Jakarta")
+                      .format("HH:mm:ss")
+                  }
+                ]
+              };
+              if (utils.isEmpty(chatFile)) {
+                chatFile.push(chatNew);
+              } else {
+                let grupSama = false;
+                for (let i = 0; i < chatFile.length; i++) {
+                  if (chatFile[i].groupId == groupId) {
+                    if (chatFile[i].chats.length == 5) {
+                      await chatFile[i].chats.shift();
+                    }
+                    await chatFile[i].chats.push({
+                      messageType,
+                      displayName,
+                      userMessage,
+                      time: moment()
+                        .tz("Asia/Jakarta")
+                        .format("HH:mm:ss")
+                    });
+                    grupSama = true;
+                  }
+                }
+                if (!grupSama) {
+                  chatFile.push(chatNew);
+                }
+              }
+            }, 500);
           });
-          setTimeout(async () => {
-            let imageBuffer = Buffer.concat(arr)
-            let type = await FileType.fromBuffer(imageBuffer);
-            // chatFile.forEach(e => {
-            //   if (){
-            //   }
-            // });
-            let imageName = `public/img/${displayName}.${type.ext}`;
-            fs.createWriteStream(imageName).write(imageBuffer);
-          }, 1000);
-        });
-      }
-      let chatNew = {
-        groupId,
-        chats: [
-          {
-            messageType,
-            displayName,
-            userMessage,
-            time: moment().tz("Asia/Jakarta").format("HH:mm:ss")
-          }
-        ]
-      };
-      if (utils.isEmpty(chatFile)) {
-        chatFile.push(chatNew);
       } else {
-        let grupSama = false;
-        for (let i = 0; i < chatFile.length; i++) {
-          if (chatFile[i].groupId == groupId) {
-            if (chatFile[i].chats.length == 5) {
-              await chatFile[i].chats.shift();
-            }
-            await chatFile[i].chats.push({
+        let chatNew = {
+          groupId,
+          chats: [
+            {
               messageType,
               displayName,
               userMessage,
-              time: moment().tz("Asia/Jakarta").format("HH:mm:ss")
-            });
-            grupSama = true;
-          }
-        }
-        if (!grupSama) {
+              time: moment()
+                .tz("Asia/Jakarta")
+                .format("HH:mm:ss")
+            }
+          ]
+        };
+        if (utils.isEmpty(chatFile)) {
           chatFile.push(chatNew);
+        } else {
+          let grupSama = false;
+          for (let i = 0; i < chatFile.length; i++) {
+            if (chatFile[i].groupId == groupId) {
+              if (chatFile[i].chats.length == 5) {
+                await chatFile[i].chats.shift();
+              }
+              await chatFile[i].chats.push({
+                messageType,
+                displayName,
+                userMessage,
+                time: moment()
+                  .tz("Asia/Jakarta")
+                  .format("HH:mm:ss")
+              });
+              grupSama = true;
+            }
+          }
+          if (!grupSama) {
+            chatFile.push(chatNew);
+          }
         }
       }
     }

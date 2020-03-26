@@ -11,13 +11,14 @@ const client = new line.Client(config);
 const botCommand = {
   halo: () => "Halo juga",
   help: () => {
-    return `1. Untuk mendapatkan jawaban dari kerang ajaib :\n,apakah {text} ?
-    \n2. Untuk menampilkan foto profil IG seseorang :\n,ig {username_ig}
-    \n3. Untuk menampilkan pesan terakhir yang diunsent (Hanya bisa digunakan dalam grup chat) :\n,re-unsend
-    \n4. Untuk memberi saran tambahan fitur untuk bot ini :\n,tambah-fitur {text}
-    \n5. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih {pilihan_1} atau {pilihan_2}?
-    \n6. Untuk mengirimkan pesan rahasia : \n,tambah-pesan {text}
-    \n7. Untuk mengambil 1 pesan rahasia : \n,ambil-pesan
+    return `1. Untuk menyapa bot :\n,halo
+    \n2. Untuk mendapatkan jawaban dari kerang ajaib :\n,apakah {text} ?
+    \n3. Untuk menampilkan foto profil IG seseorang :\n,ig {username_ig}
+    \n4. Untuk menampilkan pesan terakhir yang diunsent (Hanya bisa digunakan dalam grup chat) :\n,re-unsend
+    \n5. Untuk memberi saran tambahan fitur untuk bot ini :\n,tambah-fitur {text}
+    \n6. Untuk mendapatkan jawaban dari beberapa pilihan (pilihan dipisahkan dengan \"atau\", jumlah pilihan bebas) : \n,pilih {pilihan_1} atau {pilihan_2}?
+    \n7. Untuk mengirimkan pesan rahasia : \n,tambah-pesan {text}
+    \n8. Untuk mengambil 1 pesan rahasia : \n,ambil-pesan
     \nBACA DOKUMENTASI LENGKAP : https://github.com/Fakhri1999/line-bot-server`;
   },
   apakah: () => {
@@ -116,13 +117,16 @@ const botCommand = {
       return "Aku gak mau milih kalo pilihannya cuma 1 :(";
     }
   },
-  tambahFitur: async (userMessage, userId) => {
+  tambahFitur: async (userMessage, userId, groupId) => {
     let fitur = userMessage.substring(13);
     if (fitur.length == 0) {
       return "Pesanmu kosong";
     } else {
       try {
-        profile = userId == null ? null : await client.getProfile(userId);
+        profile =
+          userId == null
+            ? null
+            : await client.getGroupMemberProfile(groupId, userId);
       } catch (err) {
         profile = null;
       }
@@ -157,13 +161,16 @@ const botCommand = {
       return temp.join("");
     }
   },
-  tambahPesan: async (userMessage, userId) => {
+  tambahPesan: async (userMessage, userId, groupId) => {
     let pesan = userMessage.substring(13);
     if (pesan.length == 0) {
       return "Pesanmu kosong";
     } else {
       try {
-        profile = userId == null ? null : await client.getProfile(userId);
+        profile =
+          userId == null
+            ? null
+            : await client.getGroupMemberProfile(groupId, userId);
       } catch (err) {
         profile = null;
       }

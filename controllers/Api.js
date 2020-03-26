@@ -20,11 +20,10 @@ const client = new line.Client(config);
 baseUrl = "";
 const apiController = {
   lineApi: (req, res) => {
-    baseUrl = `${req.protocol}://${req.headers.host}`;
+    baseUrl = `https://${req.headers.host}`;
     Promise.all(req.body.events.map(eventHandler))
       .then(result => res.json(result))
       .catch(err => {
-        // console.error(err);
         res.status(500).end();
       });
   }
@@ -70,14 +69,16 @@ async function eventHandler(event) {
     } else if (keyword == "tambah-fitur") {
       replyMessage = await botCommand.tambahFitur(
         userMessage,
-        event.source.userId
+        event.source.userId,
+        event.source.groupId,
       );
     } else if (keyword == "ambil-fitur") {
       replyMessage = await botCommand.ambilFitur(userMessage);
     } else if (keyword == "tambah-pesan") {
       replyMessage = await botCommand.tambahPesan(
         userMessage,
-        event.source.userId
+        event.source.userId,
+        event.source.groupId,
       );
     } else if (keyword == "ambil-pesan") {
       replyMessage = await botCommand.ambilPesan();
@@ -93,15 +94,16 @@ async function eventHandler(event) {
         if (i == 0) {
           arrReply.push(textBuilder(replyMessage[i]));
         } else {
-          arrReply.push(
-            imageBuilder(replyMessage[i][0].url, replyMessage[i][0].url)
-          );
+          for (let j = 0; j < replyMessage[i].length; j++) {
+            arrReply.push(
+              imageBuilder(replyMessage[i][j].url, replyMessage[i][j].url)
+            );
+          }
         }
       }
-      console.log(arrReply);
       return client.replyMessage(event.replyToken, arrReply).catch(err => {
-        console.error(err.message);
-      });      
+        console.error(err);
+      });
     } else {
       return client.replyMessage(event.replyToken, textBuilder(replyMessage));
     }
@@ -128,12 +130,12 @@ async function eventHandler(event) {
             stream.on("data", async chunk => {
               try {
                 arr.push(chunk);
-              } catch (error) {}
+              } catch (error) { }
             });
             setTimeout(async () => {
               let imageBuffer = Buffer.concat(arr);
               let type = await FileType.fromBuffer(imageBuffer);
-              let imageName = `img/${displayName}.${type.ext}`;
+              let imageName = `img/${displayName}_${utils.randomStringGenerator(5)}.${type.ext}`;
               fs.createWriteStream(`public/${imageName}`).write(imageBuffer);
               userMessage = imageName;
               let chatNew = {

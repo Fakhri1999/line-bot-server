@@ -5,7 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "@line/bot-sdk": "^6.8.4",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "file-type": "^14.1.4",
     "knex": "^0.20.4",

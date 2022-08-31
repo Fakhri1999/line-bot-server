@@ -10,7 +10,7 @@
     "file-type": "^14.1.4",
     "knex": "^0.20.4",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.28",
+    "moment-timezone": "^0.5.35",
     "mysql": "^2.17.1",
     "mysql2": "^2.0.2"
   },
